@@ -1,0 +1,18 @@
+{
+  "name": "Motion-Control-Project",
+  "version": "0.0.0",
+  "description": "### Who are we? We are a group of students that belong to a tech team within our student chapter of ASME.  We are dedicated to exploring 3D motion control by using a Leap Motion controller to control a robotic arm.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/garrisoh/Motion-Control-Project.git"
+  },
+  "author": "Haley Garrison",
+  "license": "BSD-2-Clause",
+  "bugs": {
+    "url": "https://github.com/garrisoh/Motion-Control-Project/issues"
+  }
+}
