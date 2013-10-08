@@ -2,15 +2,15 @@
 // this exists in index.html
 var canvas = document.getElementById('game');
 var context = canvas.getContext('2d');
+var image = document.getElementById('penguin');
 
 // our 'player'
 var box = {
     x: 0,
     y: 0,
-    width: 10,
-    height: 10,
-    speed: 5,
-    color: '#4f5654'
+    width: 75,
+    height: 75,
+    speed: 5
 };
 
 // the box can update itself
@@ -20,8 +20,7 @@ box.update = function() {
 
 // the box can draw itself
 box.draw = function() {
-    context.fillStyle = box.color;
-    context.fillRect(box.x, box.y, box.width, box.height);
+    context.drawImage(image, box.x, box.y);
 }
 
 box.input = function(){
