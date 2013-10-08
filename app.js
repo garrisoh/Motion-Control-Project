@@ -1,7 +1,8 @@
 // this exists in index.html
 var canvas = document.getElementById('game');
 var context = canvas.getContext('2d');
-var image = document.getElementById('penguin');
+var image = new Image();
+image.src = 'penguin.png';
 
 // our 'player'
 var box = {
