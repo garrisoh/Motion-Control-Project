@@ -1,0 +1,4 @@
+rxtx library included by Breakout was 32 bit, so had to rename that and move system file here. Also downloaded package from internet with the rxtx library, but that causes seg faults. RXTXComm.jar is from that, though.
+Use
+	export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:"/home/daniel/Downloads/Breakout/server/breakout_server-linux"
+to set path to include the needed file (also includes anything else placed beside the jar file.)
