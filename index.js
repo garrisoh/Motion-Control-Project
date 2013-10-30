@@ -18,7 +18,14 @@ var MIN_X = -200;
 var MIN_Y = -200;
 var MIN_Z = 0;
 var MIN_R = 40;
-// Dan's constants
+var MAX2_X = 30;
+var MAX2_Y = 20;
+var MAX2_Z = 20;
+var MAX2_R = 6;
+var MIN2_X = 10;
+var MIN2_Y = -20;
+var MIN2_Z = -7.5;
+var MIN2_R = 0;
 
 controller.on('deviceFrame', function(frame){
     // do things
@@ -29,15 +36,15 @@ controller.on('deviceFrame', function(frame){
             var x = hand.palmPosition[0];
             var y = -1 * hand.palmPosition[2];
             var z = hand.palmPosition[1];
-            var r = hand.sphereRadius;
+            var r = hand.sphereRadius; // radius of arc of hand - used to calculate gripper width
             
-            x = map(x, MAX_X, MIN_X, 40, 0);
-            y = map(y, MAX_Y, MIN_Y, 20, 0);
-            z = map(z, MAX_Z, MIN_Z, 40, 0);
-            r = map(r, MAX_R, MIN_R, 4, 0);
+            x = map(x, MAX_X, MIN_X, MAX2_X, MIN2_X);
+            y = map(y, MAX_Y, MIN_Y, MAX2_Y, MIN2_Y);
+            z = map(z, MAX_Z, MIN_Z, MAX2_Z, MIN2_Z);
+            r = map(r, MAX_R, MIN_R, MAX2_R, MIN2_R);
             
             // pass into Daniel's function
-            console.log("x: " + x + " y: " + y + " z: " + z + "r: " + r);
+            console.log("x: " + x + " y: " + y + " z: " + z + " r: " + r);
         }
     }
 });
