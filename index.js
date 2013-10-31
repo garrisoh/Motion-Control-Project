@@ -10,6 +10,7 @@ var leap = require('leapjs');
 
 var controller = new leap.Controller();
 
+// leap motion max and min coordinates
 var MAX_X = 200;
 var MAX_Y = 200;
 var MAX_Z = 400;
@@ -18,6 +19,8 @@ var MIN_X = -200;
 var MIN_Y = -200;
 var MIN_Z = 0;
 var MIN_R = 40;
+
+// robot arm max and min coordinates
 var MAX2_X = 30;
 var MAX2_Y = 20;
 var MAX2_Z = 20;
@@ -28,7 +31,6 @@ var MIN2_Z = -7.5;
 var MIN2_R = 0;
 
 controller.on('deviceFrame', function(frame){
-    // do things
     var hand = frame.hands[0];
     if(hand) {
         var numFingers = hand.fingers.length;
@@ -49,7 +51,7 @@ controller.on('deviceFrame', function(frame){
     }
 });
 
-// map a value to new coordinates and constrain to high2 or low2 values if it goes over/under
+/** map a value to new coordinates and constrain to high2 or low2 values if it goes over/under */
 function map(value, high1, low1, high2, low2) {
     var percent = (value - low1)/(high1 - low1);
     if(percent > 1) {
