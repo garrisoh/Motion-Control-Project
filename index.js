@@ -1,4 +1,4 @@
-var leap = require('leapjs');
+//var leap = require('leapjs');
 
 // sets the requestAnimationFrame method equal to the correct method for the browser.  this is the method called by the controller behind the scenes, so setting it here prevents TypeError 'undefined'.
 /*window.requestAnimationFrame = 
@@ -8,7 +8,9 @@ var leap = require('leapjs');
             window.msRequestAnimationFrame || // IE
             window.oRequestAnimationFrame; // Opera*/
 
-var controller = new leap.Controller();
+//var controller = new leap.Controller();
+var controller = new Leap.Controller();
+var arm = new Arm();
 
 // leap motion max and min coordinates
 var MAX_X = 200;
@@ -23,7 +25,7 @@ var MIN_R = 40;
 // robot arm max and min coordinates
 var MAX2_X = 30;
 var MAX2_Y = 20;
-var MAX2_Z = 20;
+var MAX2_Z = 10;
 var MAX2_R = 6;
 var MIN2_X = 10;
 var MIN2_Y = -20;
@@ -47,6 +49,8 @@ controller.on('deviceFrame', function(frame){
             
             // pass into Daniel's function
             console.log("x: " + x + " y: " + y + " z: " + z + " r: " + r);
+            //arm.set(x, y, z, r);
+            arm.set(y, x, z, r);
         }
     }
 });

@@ -6,17 +6,10 @@ Issues:
 	2.) The grip linkages do not keep the jaws parallel. That means the separation at the tip is different from the separation at the back, and also that it will make less contact with objects. It also complicates the kinematics.
 	3.) The motors sometimes don't move to exactly the right position. This is mostly apparent with the base, which is often off by one degree. Thus, the coordinates need to be fudged at times.
 	4.) When the gripper opens/closes, it changes the length from wrist to tip, so the angles for a certain coordinate will change if the grip is opened or closed. The coordinates used to grab a block may not work for putting it back.
-	5.) servoRead only returns the position a servo was TOLD to go to, not the position it's actually at. So if it gets stuck, there's no way for us to tell.
+	5.) The robot cannot sense the actual angle of a motor, only what angle the motor SHOULD be at. So if it gets stuck, it won't know.
 
 Suggestions:
 	1.) Try to avoid letting the grip or anything it holds touch the board the arm is mounted on. Since there's a tendency for movements to not be fluid, it's possible for it dip down in the middle of a movement and hit the board.
-	2.) Make an arduino object and pass it into the constructor for Arm.
-*/
-
-
-/*
-IMPORTANT!!!
-Current issue: the method used for timing isn't working. Arm does not move. Investigate it.
 */
 
 
@@ -36,8 +29,6 @@ var sqrt = Math.sqrt;
 var pow = Math.pow;
 
 
-// TODO: these math functions don't work with arrays like the ones in MATLAB. Need some reworking
-
 //stacks four blocks at (27,0)
 function stackBlocks()
 {
@@ -48,45 +39,45 @@ function stackBlocks()
 	this.gripControl(openSep);	// make sure the grip is open first
 
 	// first block
-	this.moveTo([21,17,0], -55);	// position grip above block
-	this.moveStraightTo([21,17,-6], -55);	// drop down
+	this.moveTo([17,21,0], -55);	// position grip above block
+	this.moveStraightTo([17,21,-6], -55);	// drop down
 	this.gripControl(closeSep);	// grab block
-	this.moveStraightTo([21,17,0],-55);	// go up
-	this.moveTo([28,0,0], -55);	// move to above the stack
-	this.moveStraightTo([28,0,-5.5], -55);	// drop down
+	this.moveStraightTo([17,21,0],-55);	// go up
+	this.moveTo([0,28,0], -55);	// move to above the stack
+	this.moveStraightTo([0,28,-5.5], -55);	// drop down
 	this.gripControl(openSep);	// release block
-	this.moveStraightTo([28,0,0],-55);	// go up
+	this.moveStraightTo([0,28,0],-55);	// go up
 
 	// second block
-	this.moveTo([25,10,0],-55);	// position grip above block
-	this.moveStraightTo([25,10,-6], -55);	// drop down
+	this.moveTo([10,25,0],-55);	// position grip above block
+	this.moveStraightTo([10,25,-6], -55);	// drop down
 	this.gripControl(closeSep);	// grab block
-	this.moveStraightTo([25,10,0],-55);	// go up
-	this.moveTo([27,0,0],-55);	// move to above the stack
-	this.moveStraightTo([27,0,-4],-55);	// drop down
+	this.moveStraightTo([10,25,0],-55);	// go up
+	this.moveTo([0,27,0],-55);	// move to above the stack
+	this.moveStraightTo([0,27,-4],-55);	// drop down
 	this.gripControl(openSep);	// release block
-	this.moveStraightTo([27,0,2],-55);	// go up
+	this.moveStraightTo([0,27,2],-55);	// go up
 
 	// third block
-	this.moveTo([26,-9.25,2],-55);	// position grip above block
-	this.moveStraightTo([26,-9.25,-6], -55);	// drop down
+	this.moveTo([-9.25,26,2],-55);	// position grip above block
+	this.moveStraightTo([-9.25,26,-6], -55);	// drop down
 	this.gripControl(closeSep);	// grab block
-	this.moveStraightTo([26,-9.25,2],-55);	// go up
-	this.moveTo([28.5,1,2],-55);	// move to above the stack
-	this.moveStraightTo([28.5,1,-.5],-55);	// drop down
+	this.moveStraightTo([-9.25,26,2],-55);	// go up
+	this.moveTo([1,28.5,2],-55);	// move to above the stack
+	this.moveStraightTo([1,28.5,-0.5],-55);	// drop down
 	this.gripControl(openSep);	// release block
-	this.moveStraightTo([27,1,3],-55);	// go up
+	this.moveStraightTo([1,27,3],-55);	// go up
 
 	// fourth block
-	this.moveTo([12.5,-12,3],-60);	// position grip above block
-	this.moveStraightTo([12.5,-12,-7],-60);	// drop down
+	this.moveTo([-12,12.5,3],-60);	// position grip above block
+	this.moveStraightTo([-12,12.5,-7],-60);	// drop down
 	this.gripControl(closeSep);	// grab block
-	this.moveStraightTo([12.5,-12,-7],-55);
-	this.moveStraightTo([12.5,-12,5],-50);	// go up
-	this.moveTo([29,1,5],-50);	// move to above the stack
-	this.moveStraightTo([29,1,2.5],-50);	// drop down
+	this.moveStraightTo([-12,12.5,-7],-55);
+	this.moveStraightTo([-12,12.5,5],-50);	// go up
+	this.moveTo([1,29,5],-50);	// move to above the stack
+	this.moveStraightTo([1,29,2.5],-50);	// drop down
 	this.gripControl(openSep);	// release block
-	this.moveStraightTo([29,1,6],-45);	// go up
+	this.moveStraightTo([1,29,6],-45);	// go up
 
 }
 
@@ -100,48 +91,53 @@ function unstackBlocks()
 	this.gripControl(openSep);
 
 	// fourth block (top)
-	this.moveTo([28,0,6],-50);	// move to above the stack
-	this.moveTo([28.5,0,2.75],-50);	// drop down
+	this.moveTo([0,28,6],-50);	// move to above the stack
+	this.moveTo([0,28.5,2.75],-50);	// drop down
 	this.gripControl(closeSep);	// grab block
-	this.moveTo([29,0,6],-45);	// go up
-	this.moveTo([12.5,-12,5],-50);	// position grip above the mark
-	this.moveTo([12.5,-12,-7],-60);	// drop down
+	this.moveTo([0,29,6],-45);	// go up
+	this.moveTo([-12,12.5,5],-50);	// position grip above the mark
+	this.moveTo([-12,12.5,-7],-60);	// drop down
 	this.gripControl(openSep);	// release block
-	this.moveTo([12.5,-12,3],-60);	// go up
+	this.moveTo([-12,12.5,3],-60);	// go up
 
 	// third block
-	this.moveTo([27,0,3],-55);	// move to above the stack
-	this.moveTo([28,0,-.5],-55);	// drop down
+	this.moveTo([0,27,3],-55);	// move to above the stack
+	this.moveTo([0,28,-0.5],-55);	// drop down
 	this.gripControl(closeSep);	// grab block
-	this.moveTo([28,0,2.5],-55);	// go up
-	this.moveTo([25.5,-9.8,2],-55);	// position grip above the mark
-	this.moveTo([25.5,-9.8,-6.5], -55);	// drop down
+	this.moveTo([0,28,2.5],-55);	// go up
+	this.moveTo([-9.8,25.5,2],-55);	// position grip above the mark
+	this.moveTo([-9.8,25.5,-6.5], -55);	// drop down
 	this.gripControl(openSep);	// release block
-	this.moveTo([25.5,-9.8,2],-55);	// go up
+	this.moveTo([-9.8,25.5,2],-55);	// go up
 
 	// second block
-	this.moveTo([28,0,2],-55);	// move to above the stack
-	this.moveTo([28,0,-3.5],-55);	// drop down
+	this.moveTo([0,28,2],-55);	// move to above the stack
+	this.moveTo([0,28,-3.5],-55);	// drop down
 	this.gripControl(closeSep);	// grab block
-	this.moveTo([28,0,0],-55);	// go up
-	this.moveTo([25,10,0],-55);	// position grip above the mark
-	this.moveTo([25,10,-7], -55);	// drop down
+	this.moveTo([0,28,0],-55);	// go up
+	this.moveTo([10,25,0],-55);	// position grip above the mark
+	this.moveTo([10,25,-7], -55);	// drop down
 	this.gripControl(openSep);	// release block
-	this.moveTo([25,10,0],-55);	// go up
+	this.moveTo([10,25,0],-55);	// go up
 
 	// first block (bottom)
-	this.moveTo([28,0,0],-55);	// move to above the stack
-	this.moveTo([28,0,-5.5], -55);	// drop down
+	this.moveTo([0,28,0],-55);	// move to above the stack
+	this.moveTo([0,28,-5.5], -55);	// drop down
 	this.gripControl(closeSep);	// grab block
-	this.moveTo([28,0,0],-55);	// go up
-	this.moveTo([21,17,0],-55);	// position grip above the mark
-	this.moveTo([21,17,-6], -55);	// drop down
+	this.moveTo([0,28,0],-55);	// go up
+	this.moveTo([17,21,0],-55);	// position grip above the mark
+	this.moveTo([17,21,-6], -55);	// drop down
 	this.gripControl(openSep);	// release block
-	this.moveTo([21,17,0], -55);	// go up
+	this.moveTo([17,21,0], -55);	// go up
 
 }
 
-// These functions are just part of the conversion process. Needed them in MATLAB (they were built-in), shouldn't need in JavaScript, but I need to confirm that before removing them.
+
+
+
+
+// Functions from MATLAB that the code relies on, and other utility functions.
+
 function int16(x)
 {
 	if (Array.isArray(x))
@@ -281,6 +277,29 @@ function getDirectionVector(pointA, pointB)
 	return unitVector;
 }
 
+
+// END utility functions
+
+
+
+
+
+
+
+// Function to pass in info from the Leap.
+function set(x, y, z, gripSeparation)
+{
+	this.gripControl(gripSeparation);	// Set the grip separation.
+	var gripLength = this.getCurrentGripInfo().gripLength;
+	var pitchAngle = this.getAxisAngle('shoulder') + this.getAxisAngle('elbow') + this.getAxisAngle('wrist');
+	var newAngles = this.findAnglesConstantPitch([x, y, z], gripLength, pitchAngle)
+	if (this.safetyCheckAxisAngles(newAngles))
+		this.setAxisAnglesOptimized(newAngles);	// Move to specified position
+	else
+		console.log("invalid position specified");
+}
+
+
 //Constructor. Can pass in host name and network port if different from the usual.
 function Arm(host, networkPort)
 {
@@ -342,17 +361,14 @@ function Arm(host, networkPort)
 	this.move = move;
 	this.stackBlocks = stackBlocks;
 	this.unstackBlocks = unstackBlocks;
+	this.set = set;
 }
 
 function onReady(event)
 {
 	// Remove the event listener because it is no longer needed
-	//this.ardy.removeEventListener(IOBoardEvent.READY, onReady2);
-	/*this.baseMotor = new Servo(this.ardy, this.ardy.getDigitalPin(11), this.baseAxisRange[0], this.baseAxisRange[1]);
-	this.shoulderMotor = new Servo(this.ardy, this.ardy.getDigitalPin(10), this.shoulderAxisRange[0], this.shoulderAxisRange[1]);
-	this.elbowMotor = new Servo(this.ardy, this.ardy.getDigitalPin(9), this.elbowAxisRange[0], this.elbowAxisRange[1]);
-	this.wristMotor = new Servo(this.ardy, this.ardy.getDigitalPin(6), this.wristAxisRange[0], this.wristAxisRange[1]);
-	this.gripMotor = new Servo(this.ardy, this.ardy.getDigitalPin(5), this.gripAxisRange[0], this.gripAxisRange[1]);*/
+	//this.ardy.removeEventListener(IOBoardEvent.READY, onReady);
+	
 	
 	// Note: if the range of the motor is set here, BreakoutJS will reassign the range to whatever the values are, ie 0-180 (actual range of physical motor) becomes -90-90, and saying motor.angle = 0 will set it to what would have previously been 90. Should make use of that, after getting things working.
 	this.baseMotor = new Servo(this.ardy, this.ardy.getDigitalPin(11) );
@@ -365,7 +381,6 @@ function onReady(event)
 	
 	
 	// Go to initial position
-	//this.setAxisAnglesOptimized(this.axisAngles);
 	if (!this.safetyCheckAxisAngles(this.axisAngles))
 	{
 		console.log("invalid initial angles.");
@@ -414,10 +429,9 @@ function findAnglesConstantPitch(coordinates, gripLength, pitchAngle)
 	var newElbowAngle =  C - 180;
 	var newShoulderAngle = shoulderToWristAngle + B;
 
-	// pitchAngle = newWristAngle + newElbowAngle + newShoulderAngle
 	var newWristAngle = pitchAngle - newElbowAngle - newShoulderAngle;
 
-	var newBaseAngle = atand(y/x);
+	var newBaseAngle = atand(x/y);
 
 	// Due to loss of precision, it's possible to get angles with slight unreal components for perfectly-reasonable coordinates, so we have to deal with that.
 	if ( !isreal(newElbowAngle) || !isreal(newShoulderAngle) || !isreal(newBaseAngle) || !isreal(newWristAngle) )
@@ -447,8 +461,8 @@ function findCoordinates(angles, gripLength)
 	var wristAngle = angles[3];
 	var z = this.segment1Length * sind(shoulderAngle) + this.segment2Length * sind(elbowAngle + shoulderAngle) + gripLength * sind(wristAngle + elbowAngle + shoulderAngle);
 	var horizontalLength = this.segment1Length * cosd(shoulderAngle) + this.segment2Length * cosd(elbowAngle + shoulderAngle) + gripLength * cosd(wristAngle + elbowAngle + shoulderAngle);
-	var x = horizontalLength * cosd(baseAngle);
-	var y = horizontalLength * sind(baseAngle);
+	var y = horizontalLength * cosd(baseAngle);
+	var x = horizontalLength * sind(baseAngle);
 	var coordinates = new Array(x,y,z);
 	return coordinates;
 }
@@ -464,10 +478,6 @@ function safetyCheckAxisAngles(angles)
 		return false;
 	for ( var i = 0; i < angles.length; ++i)
 	{
-		/*if ( abs(angles[i] ) == Inf )
-		{
-			return false;
-		}*/
 		if ( angles[i] === NaN)
 			return false;
 		if ( angles[i] < this.axisRanges[i][0] || angles[i] > this.axisRanges[i][1] )
@@ -488,14 +498,14 @@ function getGripInfo(topLinkageAngle)
 	var linkageSeparationGripper = 2.7;	// distance between where the two linkages attach on the gripper side
 	var gripperBendDistance = 4.7;	// distance from where the top linkage attaches to where the piece bends
 	var bendAngle = 30;	// angle that the grip bends between the pad and where it attaches to the linkages.
-	var xBendToTip = 6.9;	// distance from the bend to the tip of the gripper (measured in line with the two screws holding the grip together.
+	var yBendToTip = 6.9;	// distance from the bend to the tip of the gripper (measured in line with the two screws holding the grip together.
 	var gripInteriorStep = .8;	// distance from the inner part of the grip (with pad) to the line between the two screws.
 	var topLinkageSeparation = 2.75;	// distance between the axes of the two gears (or the ends of the two top linkages)
 	var bottomLinkageSeparation = 1;	// distance between the two bottom linkages
-	var topToBottomLinkDistanceX = 2.4;	// distance between the top and bottom linkages on the main body (motor side), measured parallel to arm
-	var topToBottomLinkDistanceY = (topLinkageSeparation - bottomLinkageSeparation) / 2;	// distance between the top and bottom linkages on the main body (motor side), measured perpendicular to arm
-	var topToBottomLinkDistanceTotal = sqrt(pow(topToBottomLinkDistanceY,2) + pow(topToBottomLinkDistanceX,2) );	// distance between axes of top  and bottom linkages on the arm end
-	var topToBottomLinkAngle = atand(topToBottomLinkDistanceY/topToBottomLinkDistanceX);	// angle between anchor points of the top and bottom linkages
+	var topToBottomLinkDistanceY = 2.4;	// distance between the top and bottom linkages on the main body (motor side), measured parallel to arm
+	var topToBottomLinkDistanceX = (topLinkageSeparation - bottomLinkageSeparation) / 2;	// distance between the top and bottom linkages on the main body (motor side), measured perpendicular to arm
+	var topToBottomLinkDistanceTotal = sqrt(pow(topToBottomLinkDistanceX,2) + pow(topToBottomLinkDistanceY,2) );	// distance between axes of top  and bottom linkages on the arm end
+	var topToBottomLinkAngle = atand(topToBottomLinkDistanceX/topToBottomLinkDistanceY);	// angle between anchor points of the top and bottom linkages
 	var wristToGripGearLength = 4.7;	// length from the wrist axis to the center of the gears
 
 	/*
@@ -527,23 +537,20 @@ function getGripInfo(topLinkageAngle)
 	var gripPadAngle = ( topLinkageAngle - ( 180 - BAC ) + bendAngle );
 
 	// x and y coordinates of a gripper tip, with (0,0) as the center of the gear the top linkage is attached to
-	var x = (xBendToTip+gripperBendDistance*cosd(bendAngle))*cosd(gripPadAngle) + (gripInteriorStep+gripperBendDistance*sind(bendAngle))*sind(gripPadAngle) + topLinkageLength*cosd(topLinkageAngle);
-	var y = (xBendToTip+gripperBendDistance*cosd(bendAngle))*sind(gripPadAngle) + (gripInteriorStep+gripperBendDistance*sind(bendAngle))*sind(gripPadAngle-90) + topLinkageLength*sind(topLinkageAngle);
+	var y = (yBendToTip+gripperBendDistance*cosd(bendAngle))*cosd(gripPadAngle) + (gripInteriorStep+gripperBendDistance*sind(bendAngle))*sind(gripPadAngle) + topLinkageLength*cosd(topLinkageAngle);
+	var x = (yBendToTip+gripperBendDistance*cosd(bendAngle))*sind(gripPadAngle) + (gripInteriorStep+gripperBendDistance*sind(bendAngle))*sind(gripPadAngle-90) + topLinkageLength*sind(topLinkageAngle);
 
 	// these are for debugging purposes.
-	var yAtTopLink = topLinkageLength*sind(topLinkageAngle);
-	var sepAtTopLink = 2*yAtTopLink + topLinkageSeparation;
-	var yAtBend = yAtTopLink + (gripperBendDistance*cosd(bendAngle))*sind(gripPadAngle) + (gripperBendDistance*sind(bendAngle) )*sind(gripPadAngle-90);
-	var sepAtBend = 2*yAtBend + topLinkageSeparation;
-	var yAtTip = (xBendToTip + gripperBendDistance*cosd(bendAngle))*sind(gripPadAngle) + (gripInteriorStep+gripperBendDistance*sind(bendAngle))*sind(gripPadAngle-90) + topLinkageLength*sind(topLinkageAngle);
+	var xAtTopLink = topLinkageLength*sind(topLinkageAngle);
+	var sepAtTopLink = 2*xAtTopLink + topLinkageSeparation;
+	var xAtBend = xAtTopLink + (gripperBendDistance*cosd(bendAngle))*sind(gripPadAngle) + (gripperBendDistance*sind(bendAngle) )*sind(gripPadAngle-90);
+	var sepAtBend = 2*xAtBend + topLinkageSeparation;
+	var xAtTip = (yBendToTip + gripperBendDistance*cosd(bendAngle))*sind(gripPadAngle) + (gripInteriorStep+gripperBendDistance*sind(bendAngle))*sind(gripPadAngle-90) + topLinkageLength*sind(topLinkageAngle);
 
-	var currentSeparation = 2*y + topLinkageSeparation;
-	var gripLength = x + wristToGripGearLength;
+	var currentSeparation = 2*x + topLinkageSeparation;
+	var gripLength = y + wristToGripGearLength;
 
 	var info = {'separation': currentSeparation, 'gripLength': gripLength, 'gripPadAngle': gripPadAngle};
-	/*info.separation = currentSeparation;
-	info.gripLength = gripLength;
-	info.gripPadAngle = gripPadAngle;*/
 	return info;
 }
 
@@ -630,8 +637,6 @@ function moveAxesAtSpeedEvenly(targetAngles, speed, maxDegreeStep)
 		this.setAxisAnglesOptimized(nextAngles);
 		pause(period*degreeStep*1000);
 		currentAngles = nextAngles;	// updating the angles.
-		
-		
 	}
 }
 
@@ -649,12 +654,8 @@ function moveAxesAtSpeed(targetAngles, speed, degreeStep)
 	targetAngles = int16(targetAngles);
 	var thereYet = false;
 	
-	//this.moveTheAxes = moveTheAxes;
-	//this.moveTheAxes();
 	while (!thereYet)
 	{
-	//function moveTheAxes()
-	//{
 		var currentAngles = this.axisAngles;
 		var nextAngles = new Array();
 		for (var i = 0; i < this.axisAngles.length; ++i)
@@ -677,15 +678,8 @@ function moveAxesAtSpeed(targetAngles, speed, degreeStep)
 				// the degreeStep is larger than the distance we have left.
 				nextAngles[i] = targetAngles[i];
 		}
-		this.setAxisAnglesOptimized(nextAngles);	// using optimized function now.
+		this.setAxisAnglesOptimized(nextAngles);
 		pause(period*degreeStep*1000);
-		
-	/*	this.setAxisAnglesOptimized(nextAngles);
-		if (!thereYet)
-		{
-			//setTimeout(moveTheAxes, 1000*period*degreeStep);
-			setTimeout(moveTheAxes, period*degreeStep);
-		}*/
 			
 	}
 }
@@ -784,8 +778,6 @@ function moveToInches(coordinates, pitchAngle)
 }
 
 
-
-
 function getCurrentGripInfo()
 {
 	return this.getGripInfo(this.getAxisAngle('grip'));
@@ -848,7 +840,6 @@ function move(axisName, angle, relative, safetyRangeOverride)
 		return;
 	}
 
-	//this.ardy.servoWrite(this.ports[i], int16(angle + this.axisToMotorAdjustments[i]) );	// send command
 	this.motors[i].angle = angle + this.axisToMotorAdjustments[i];
 	this.axisAngles[i] = angle;
 }
