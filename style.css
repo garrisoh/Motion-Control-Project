@@ -4,17 +4,39 @@ body {
 }
 
 div {
-    margin-top: 150px;
-}
-
-div div {
-    font-size: 150px;
+    font-size: 100px;
     color: white;
     display: inline-block;
-    margin: 10px 20px 10px 20px;
     font-family: sans-serif;
 }
 
-.label {
-    font-size: 40px;
+#forward {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    height: 225px;
+}
+
+#backward {
+    margin-left: auto;
+    margin-right: auto;
+    display: block;
+    clear: both;
+    height: 225px;
+    padding-top: 120px;
+}
+
+#left {
+    margin: 10px;
+    float: left;
+}
+
+#right {
+    margin: 10px;
+    float: right;
+}
+
+#center {
+    margin-left: auto;
+    margin-right: auto;
 }
